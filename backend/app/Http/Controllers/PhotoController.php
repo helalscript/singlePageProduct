@@ -7,12 +7,14 @@ use Illuminate\Http\Request;
 
 class PhotoController extends Controller
 {
+    use ApiResponse;
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $photos = Photo::orderBy('id', 'desc')->get();
+        return $this->sendResponse($photos, 'Photos list fetched successfully!');
     }
 
     /**
