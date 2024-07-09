@@ -31,27 +31,33 @@ class ProductsController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'price' => 'required',
-            'description' => 'required',
-            'path' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error.', $validator->errors(), 422);
-        }
-        $input['name'] = $request->name;
-        $input['price'] = $request->price;
-        $input['description'] = $request->description;
-        $path['path'] = $request->path;
-        $file = $request->path;
-        $filename = time() . '.' . $file->getClientOriginalExtension();
-        $request->path->move(public_path('photos/products'), $filename);
-        $products = Product::create($input);
-        $products->photo()->create(['path' => $filename]);
-        return $this->sendResponse($products, 'Product created successfully!');
+{
+    $validator = Validator::make($request->all(), [
+        'name' => 'required',
+        'price' => 'required',
+        'description' => 'required',
+        //'path.*' => 'required|image',
+    ]);
+
+    if ($validator->fails()) {
+        return $this->sendError('Validation Error.', $validator->errors(), 422);
     }
+    $input['name'] = $request->name;
+    $input['price'] = $request->price;
+    $input['description'] = $request->description;
+    //$products = Product::create($input);
+    $files=$request->path;
+    $filename=[];
+     if ($request->hasFile('path')) {
+    foreach ($files as $image) {
+       $filename = time() . '.' . $files->getClientOriginalExtension();
+    //$image->move(public_path('photos/products'), $filename);
+    //     $products->photo()->create(['path' => $filename]);
+        };
+    }
+    return $this->sendResponse($filename, 'Product created successfully!');
+}
+
 
     /**
      * Display the specified resource.
