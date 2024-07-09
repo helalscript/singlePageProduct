@@ -1,11 +1,12 @@
 <script>
 import axios from 'axios'
 import { RouterLink, RouterView } from "vue-router";
-import HelloWorld from "./components/HelloWorld.vue";
+
 export default{
   data(){
     return{
-      url: "http://127.0.0.1:8000/api/admin/products",
+      url: this.$store.state.base.url+"admin/products",
+      imageLink: this.$store.state.base.imageLink,
        name: "",
        price: "",
        description: "",
@@ -49,33 +50,28 @@ export default{
     save() {
             const formData = new FormData();
             formData.append('path', this.path);
-        // this.imagePreview.forEach((preview) => {
-        //   formData.append('images[]', preview);
-        // });
             const alldata = {
                 name: this.name,
                 price: this.price,
                 description: this.description,
                 path: this.path
             }
-            //console.log(alldata)
             axios.post(this.url, alldata, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             })
             .then((response) => {
-                // this.name="";
-                // this.price="";
-                // this.description="";
-                // this.path="";
-                // this.imagePreview =[];
-                // this.getProductList();
+                this.name="";
+                this.price="";
+                this.description="";
+                this.path=[];
+                this.imagePreview =[];
+                this.getProductList();
                 console.log(response);
             });
         },
         },
-
     mounted() {
         this.getProductList();
     },
@@ -126,35 +122,25 @@ export default{
       </div>
       <div class="col-md-6 bg-success-subtle">
         <div class="row">
-          <div class="col-md-6">
+          
+          <div class="col-md-6"  v-for="(data, i) in productlist" :key="i">
             <div class="card mt-4">
-              <img class="card-img-top" src="" />
+              <img class="card-img-top" :src="`http://127.0.0.1:8000/photos/products/${data.photo.path}`"/>
               <div class="card-body">
                 <p class="card-text">
-                  <strong> post.title </strong> <br />
-                  post.body
+                  <strong> {{ data.name }} </strong> <br />
+                  {{ data.description.length <= 10 ? data.description : data.description.substr(0, 20) + '...' }}
                 </p>
               </div>
               <button class="btn btn-success m-2">View Post</button>
             </div>
           </div>
-          <div width="40%">
-            <span>
-              <h3>currentPost.title</h3>
-              <div class="row">
-                <div class="col-md-6">
-                  <img src="" class="img-thumbnail" alt="no image" />
-                </div>
-              </div>
-              <hr />
-
-            </span>
-          </div>
-        </div>
+    </div>
+      </div>
       </div>
     </div>
   </div>
-</div>
+
  
 </template>
 

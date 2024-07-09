@@ -31,32 +31,31 @@ class ProductsController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'name' => 'required',
-        'price' => 'required',
-        'description' => 'required',
-        //'path.*' => 'required|image',
-    ]);
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'price' => 'required',
+            'description' => 'required',
+            'path.*' => 'required|image',
+        ]);
 
-    if ($validator->fails()) {
-        return $this->sendError('Validation Error.', $validator->errors(), 422);
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors(), 422);
+        }
+        $input['name'] = $request->name;
+        $input['price'] = $request->price;
+        $input['description'] = $request->description;
+        $products = Product::create($input);
+        $files = $request->path;
+        if ($request->hasFile('path')) {
+            foreach ($files as $key => $image) {
+                $filename = $key . time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('photos/products'), $filename);
+                $products->photo()->create(['path' => $filename]);
+            }
+        }
+        return $this->sendResponse($products, 'Product created successfully!');
     }
-    $input['name'] = $request->name;
-    $input['price'] = $request->price;
-    $input['description'] = $request->description;
-    //$products = Product::create($input);
-    $files=$request->path;
-    $filename=[];
-     if ($request->hasFile('path')) {
-    foreach ($files as $image) {
-               $filename = time() . '.' . $image->getClientOriginalExtension();
-    $image->move(public_path('photos/products'), $filename); 
-    //$products->photo()->create(['path' => $filename]);
-        };
-    }
-    return $this->sendResponse($filename, 'Product created successfully!');
-}
 
 
     /**
@@ -66,7 +65,7 @@ class ProductsController extends Controller
     {
         $products = Product::with('photo')->find($id);
         return $this->sendResponse($products, 'Product fetched successfully!');
-   
+
     }
 
     /**
@@ -97,14 +96,14 @@ class ProductsController extends Controller
         }
         $input = $request->all();
         if ($request->hasFile('photo')) {
-                // Delete the old photo if it exists
+            // Delete the old photo if it exists
             $oldFilename = $product->photo->path;
             File::delete('photos/products/' . $oldFilename);
             $file = $request->photo;
             $filename = time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('photos/products'), $filename);
             // Update the product's photo path
-             $product->photo()->update(['path' => $filename]);
+            $product->photo()->update(['path' => $filename]);
         }
         $product->update($input);
         return $this->sendResponse($product, 'Product updated successfully!');
