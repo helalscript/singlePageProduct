@@ -50,9 +50,9 @@ class ProductsController extends Controller
     $filename=[];
      if ($request->hasFile('path')) {
     foreach ($files as $image) {
-       $filename = time() . '.' . $files->getClientOriginalExtension();
-    //$image->move(public_path('photos/products'), $filename);
-    //     $products->photo()->create(['path' => $filename]);
+               $filename = time() . '.' . $image->getClientOriginalExtension();
+    $image->move(public_path('photos/products'), $filename); 
+    //$products->photo()->create(['path' => $filename]);
         };
     }
     return $this->sendResponse($filename, 'Product created successfully!');

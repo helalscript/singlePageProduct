@@ -48,7 +48,7 @@ export default{
  // ================= for create new product ==================
     save() {
             const formData = new FormData();
-            formData.append('photo', this.path);
+            formData.append('path', this.path);
         // this.imagePreview.forEach((preview) => {
         //   formData.append('images[]', preview);
         // });
