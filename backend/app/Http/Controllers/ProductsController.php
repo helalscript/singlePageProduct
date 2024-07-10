@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Photo;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -114,14 +115,18 @@ class ProductsController extends Controller
      */
     public function destroy(string $id)
     {
+       
         $products = Product::findOrFail($id);
+        
         if (is_null($products)) {
             return $this->sendError('Product not found.');
         }
-        $oldFilename = $products->photo->path;
-        File::delete('photos/products/' . $oldFilename);
-        $products->photo->delete();
+        $oldFilename = $products->photo;
+        foreach($oldFilename as $key=> $Delfile){
+             File::delete('photos/products/' . $Delfile->path);  
+        }
+        $photo = Photo::where('product_id', $id)->delete();
         $products->delete();
-        return $this->sendResponse($oldFilename, 'Product deleted successfully!');
+        return $this->sendResponse($photo, 'Product deleted successfully!');
     }
 }

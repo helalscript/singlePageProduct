@@ -7,6 +7,7 @@ export default{
     return{
       url: this.$store.state.base.url+"admin/products",
       imageLink: this.$store.state.base.imageLink,
+       id:"",
        name: "",
        price: "",
        description: "",
@@ -68,9 +69,28 @@ export default{
                 this.path=[];
                 this.imagePreview =[];
                 this.getProductList();
-                console.log(response);
             });
         },
+        // ==================== product delete with all photo===========================
+        deleteProduct(id) {
+      axios.delete(`${this.url}/${id}`)
+      .then((response) => {
+                 this.getProductList();
+            });
+    },
+    editProduct(id) {
+      axios.get(`${this.url}/${id}`)
+      .then((response) => {
+        //$getdata=response.data;
+         console.log(response.data.data.photo)
+        this.id=response.data.data.id;
+        this.name=response.data.data.name;
+        this.price=response.data.data.price;
+        this.description=response.data.data.description;
+        this.path=response.data.data.photo;
+        this.imagePreview=response.data.data.photo;
+            });
+    },
         },
     mounted() {
         this.getProductList();
@@ -98,7 +118,16 @@ export default{
               <label for="exampleFormControlTextarea1">Details</label>
               <textarea class="form-control" rows="3" required v-model="description"></textarea>
             </div>
-            <div class="form-group">
+<!-- ---------------------product edit mood-------------------- -->
+            <div v-if="id!=''">
+              <div class="row">
+          <div class="col-4" v-for="(preview, index) in imagePreview" :key="index">
+              <img :src="`http://127.0.0.1:8000/photos/products/${preview.path}`" width="150rem" height="175rem" class="border border-primary"/>
+            </div> 
+              </div> 
+            </div>
+<!-- ---------------------product create mood-------------------- -->
+            <div class="form-group" v-else>
               <label for="imageUpload">Image Upload</label>
               <div class="dropzone">
                 <span>Drag or Drop File</span>
@@ -107,9 +136,6 @@ export default{
                 <input type="file" id="dropzoneFile" class="dropzoneFile" @change="onFileSelected" multiple/>
               </div>
               <div class="row ">
-                <!-- <div class="col-4">
-                <img v-if="imagePreview" :src="imagePreview" width="150rem" height="175rem"/>
-              </div> -->
               <div class="col-4 " v-for="(preview, index) in imagePreview" :key="index">
       <img :src="preview" alt="Image Preview" width="150rem" height="175rem" class="border border-primary"/>
     </div>
@@ -117,22 +143,30 @@ export default{
             </div>
         </div>
         <div class="card-footer">
-          <button type="button" class="btn btn-success" @click="save()">Create Product</button>
+          <button type="button" class="btn btn-success" @click="update()" v-if="id!=''">Update Product</button>
+          <button type="button" class="btn btn-warning" @click="back()" v-if="id!=''">Cancle Update</button>
+          <button type="button" class="btn btn-success" @click="save()" v-else="id=''">Create Product</button>
         </div>
+         
       </div>
       <div class="col-md-6 bg-success-subtle">
         <div class="row">
           
           <div class="col-md-6"  v-for="(data, i) in productlist" :key="i">
             <div class="card mt-4">
-              <img class="card-img-top" :src="`http://127.0.0.1:8000/photos/products/${data.photo.path}`"/>
+              <img class="card-img-top" :src="`http://127.0.0.1:8000/photos/products/${data.photo[0].path}`" width="200rem" height="250rem"/>
               <div class="card-body">
                 <p class="card-text">
                   <strong> {{ data.name }} </strong> <br />
                   {{ data.description.length <= 10 ? data.description : data.description.substr(0, 20) + '...' }}
                 </p>
               </div>
-              <button class="btn btn-success m-2">View Post</button>
+              <div class="">
+              <button class="btn btn-success btn-sm col-4">View</button>
+              <button class="btn btn-warning btn-sm col-4" @click="editProduct(data.id)">Edit</button>
+              <button class="btn btn-danger btn-sm col-4" @click="deleteProduct(data.id)">Delete</button>
+              </div>
+              
             </div>
           </div>
     </div>

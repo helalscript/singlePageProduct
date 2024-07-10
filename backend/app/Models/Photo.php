@@ -9,8 +9,8 @@ class Photo extends Model
 {
     use HasFactory;
     protected $guarded=['id'];
-    public function photoable()
+    public function product()
     {
-        return $this->morphTo();
+        return $this->belongsTo(Photo::class);
     }
 }

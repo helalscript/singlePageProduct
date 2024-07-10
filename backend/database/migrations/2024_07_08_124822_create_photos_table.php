@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('photos', function (Blueprint $table) {
             $table->id();
             $table->string('path');
-            $table->unsignedBigInteger('photoable_id');
-            $table->string('photoable_type');
+            $table->unsignedBigInteger('product_id');
             $table->timestamps();
         });
     }
